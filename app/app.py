@@ -46,6 +46,22 @@ def create():
     }
     return jsonify(tdict),201
 
+@app.route("/<id>", methods=["PUT"])
+def update(id):
+    result = db.session.query(ToDo).filter_by(id=id).first()
+    if result:
+        data = request.json
+        result.date = data.get("date")
+        result.whattodo = data.get("whattodo")
+        db.session.commit()
+        tdict = {
+            "date": result.date,
+            "whattodo": result.whattodo
+        }
+        return jsonify({"changes": f"{tdict}"}),201
+    else:
+        return jsonify({"result": f"Id {id} wasn't found"}),404
+
 @app.route("/<id>", methods=["DELETE"])
 def delete_id(id):
     data = db.session.query(ToDo).filter_by(id=id).first()
