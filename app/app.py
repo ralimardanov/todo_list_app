@@ -3,12 +3,13 @@ from app.models import ToDo
 from flask import request,jsonify
 from db_setup.db_conf import db
 import os
+from app.serializer import TodoSchema
 
 settings_name = os.getenv("APP_SETTINGS")
 
-app = create_app(settings_name)
+app = create_app(settings_name)   # migration elave ele
 
-@app.route("/all", methods=["GET"])
+@app.route("/todo/all", methods=["GET"])
 def get_results():
     results = db.session.query(ToDo).all()
     tlist = []
@@ -20,33 +21,38 @@ def get_results():
         }
         tlist.append(tdict)
 
-    return jsonify(tlist),200
+    return jsonify(tlist),200  # default 200 qaytarir onsuz
 
-@app.route("/<id>", methods=["GET"])
+@app.route("/todo/<id>", methods=["GET"])
 def get_result(id):
-    data = db.session.query(ToDo).filter_by(id=id).first()
+    data = db.session.query(ToDo).filter_by(id=id).first()  # db.session.query(ToDo).get(id)
     if data:
         tdict = {
+            "id": data.id, # id-de qayitmaliydi
             "date": data.date,
             "whattodo": data.whattodo
         } 
         return jsonify(tdict),200
-    else:
-        return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/", methods=["POST"])
+    return jsonify({"result": f"Id {id} wasn't found"}),404
+
+@app.route("/todo", methods=["POST"])
 def create():
     data = request.json
+    
     result = ToDo(**data)
     db.session.add(result)
     db.session.commit()
-    tdict = {
-        "date": result.date,
-        "whattodo": result.whattodo
-    }
-    return jsonify(tdict),201
+    # tdict = {
+    #     # id-ni elav elememisen
+    #     "date": result.date,
+    #     "whattodo": result.whattodo
+    # }
+    schema = TodoSchema()
+    data = schema.dump(result)
+    return jsonify(data),201
 
-@app.route("/<id>", methods=["PUT"])
+@app.route("/todo/<id>", methods=["PUT"])
 def update(id):
     result = db.session.query(ToDo).filter_by(id=id).first()
     if result:
@@ -59,15 +65,15 @@ def update(id):
             "whattodo": result.whattodo
         }
         return jsonify({"changes": f"{tdict}"}),201
-    else:
-        return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/<id>", methods=["DELETE"])
+    return jsonify({"result": f"Id {id} wasn't found"}),404
+
+@app.route("/todo/<id>", methods=["DELETE"])
 def delete_id(id):
     data = db.session.query(ToDo).filter_by(id=id).first()
     if data:
         db.session.delete(data)
         db.session.commit()
         return jsonify({"result": f"Id {id} was deleted"}),200
-    else:
-        return jsonify({"result": f" Id {id} wasn't found"}),404
+
+    return jsonify({"result": f" Id {id} wasn't found"}),404
