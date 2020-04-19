@@ -21,35 +21,28 @@ def get_results():
         }
         tlist.append(tdict)
 
-    return jsonify(tlist),200  # default 200 qaytarir onsuz
+    return jsonify(tlist) # default 200 qaytarir onsuz
 
 @app.route("/todo/<id>", methods=["GET"])
 def get_result(id):
     data = db.session.query(ToDo).filter_by(id=id).first()  # db.session.query(ToDo).get(id)
     if data:
         tdict = {
-            "id": data.id, # id-de qayitmaliydi
+            "id": data.id,
             "date": data.date,
             "whattodo": data.whattodo
         } 
-        return jsonify(tdict),200
-
+        return jsonify(tdict)
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
 @app.route("/todo", methods=["POST"])
 def create():
     data = request.json
-    
     result = ToDo(**data)
     db.session.add(result)
     db.session.commit()
-    # tdict = {
-    #     # id-ni elav elememisen
-    #     "date": result.date,
-    #     "whattodo": result.whattodo
-    # }
     schema = TodoSchema()
-    data = schema.dump(result)
+    data = schema.dump(result) # use this ToDoSchema everywhere where you return dictionary.
     return jsonify(data),201
 
 @app.route("/todo/<id>", methods=["PUT"])
@@ -60,12 +53,9 @@ def update(id):
         result.date = data.get("date")
         result.whattodo = data.get("whattodo")
         db.session.commit()
-        tdict = {
-            "date": result.date,
-            "whattodo": result.whattodo
-        }
-        return jsonify({"changes": f"{tdict}"}),201
-
+        schema = TodoSchema
+        data = schema.dump(result)
+        return jsonify({"changes": f"{data}"}),201
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
 @app.route("/todo/<id>", methods=["DELETE"])
@@ -74,6 +64,5 @@ def delete_id(id):
     if data:
         db.session.delete(data)
         db.session.commit()
-        return jsonify({"result": f"Id {id} was deleted"}),200
-
+        return jsonify({"result": f"Id {id} was deleted"})
     return jsonify({"result": f" Id {id} wasn't found"}),404
