@@ -2,7 +2,11 @@ from flask import Flask
 import os
 from db_setup.db_conf import db
 from flask_marshmallow import Marshmallow
+from marshmallow import fields,validate,validates_schema
 from flask_migrate import Migrate
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes="sha256_crypt")
 
 ma = Marshmallow()
 
