@@ -11,18 +11,15 @@ class ToDo(db.Model):
         db.session.commit()
         return self
 
-
     def update_db(self,**kwargs):
         for key,value in kwargs.items():
-            setattr(self,key,value)
-        
+            setattr(self,key,value)        
         return self.save_db()
     
     def delete_from_db(self):
         db.session.delete(self)
         db.session.commit()
         return True # return self-de ede bilersen eger silennen sora lazim olacagsa
-    
 
 class Users(db.Model):
     __tablename__ = "users"
@@ -37,11 +34,9 @@ class Users(db.Model):
         db.session.commit()
         return self
 
-
     def update_db(self,**kwargs):
         for key,value in kwargs.items():
             setattr(self,key,value)
-        
         return self.save_db()
     
     def delete_from_db(self):
