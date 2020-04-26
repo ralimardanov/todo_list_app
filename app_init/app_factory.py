@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes="sha256_crypt")
 ma = Marshmallow()
 
 settings = {
-    "prod": "settings.prdsettings.PRDsettings",
+    "prod": "settings.prdsettings.PRDsettings",  # eger fayyl olsa path-deki kimi / istifade olunacag
     "dev": "settings.devsettings.DEVsettings"
 }
 
@@ -20,13 +20,15 @@ def get_settings(settings_name):
     raise Exception("Setting name you select %s isn't supported" % settings_name)
 
 def create_app(settings_name):
-    app = Flask(__name__)
+    app = Flask(__name__,template_folder="../app/templates",static_folder="../app/static")
     db.init_app(app)
     ma.init_app(app)
     settings_obj = get_settings(settings_name)
     app.config.from_object(settings_obj) #this loads the config from the settings_obj. also can be loaded from_envvar
-    migrate = Migrate(app,db)
+    Migrate(app,db) 
     # with app.app_context():
     #     db.create_all()
 
     return app
+
+
