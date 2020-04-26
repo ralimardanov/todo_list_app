@@ -8,43 +8,38 @@ from pprint import pprint
 from marshmallow import ValidationError
 from app.utils import verify_password
 
-
 settings_name = os.getenv("APP_SETTINGS")
 app = create_app(settings_name)
 
-
 # flask login-e baxarsan https://flask-login.readthedocs.io/en/latest/
-#bootstrap cdn https://www.bootstrapcdn.com/
+# bootstrap cdn https://www.bootstrapcdn.com/
 # user datani edit etmek ucun endpoint yazmaga caliw
-#jinja https://jinja.palletsprojects.com/en/2.11.x/
+# jinja https://jinja.palletsprojects.com/en/2.11.x/
 
-########################################################
-                    # after changes:
-########################################################
-
+# for API calls
 # ToDo part:
-@app.route("/todo", methods=["GET"])
+@app.route("/api/todo", methods=["GET"])
 def get_results():
     # results = db.session.query(ToDo).all() # bu method pure SqlAlchemy-ide verilme qaydasidi
     results = ToDo.query.all() # ancaq Flask-Sqlalchemy-de iwleyir
     return TodoSchema().jsonify(results,many=True)
     # eger list-in icinde objectleri serialize elemek isdesen many=True vermelisen
 
-@app.route("/todo/<id>", methods=["GET"])
+@app.route("/api/todo/<id>", methods=["GET"])
 def get_result(id):
     data = ToDo.query.filter_by(id=id).first() 
     if data:
         return TodoSchema().jsonify(data)
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/todo", methods=["POST"])
+@app.route("/api/todo", methods=["POST"])
 def create():
     data = request.json
     todo = TodoSchema().load(data)
     todo.save_db()
     return TodoSchema().jsonify(todo)
 
-@app.route("/todo/<id>", methods=["PUT"])
+@app.route("/api/todo/<id>", methods=["PUT"])
 def update(id):
     result = ToDo.query.filter_by(id=id).first()
     if result:
@@ -54,7 +49,7 @@ def update(id):
         return TodoSchema().jsonify(result)        
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/todo/<id>", methods=["DELETE"])
+@app.route("/api/todo/<id>", methods=["DELETE"])
 def delete_id(id):
     data = ToDo.query.filter_by(id=id).first()
     if data:
@@ -63,7 +58,7 @@ def delete_id(id):
     return jsonify({"result": f" Id {id} wasn't found"}),404
 
 # Users part:
-@app.route("/users", methods=["POST"])
+@app.route("/api/users", methods=["POST"])
 def create_user():
     data = request.get_json()
     try:
@@ -75,19 +70,19 @@ def create_user():
         return jsonify({"result": str(err)}),400
     return UserSchema(exclude=("password",)).jsonify(user)
 
-@app.route("/users", methods=["GET"])
+@app.route("/api/users", methods=["GET"])
 def get_users_results():
     results = Users.query.all()
     return UserSchema(exclude=("password",)).jsonify(results,many=True)
 
-@app.route("/users/<id>", methods=["GET"])
+@app.route("/api/users/<id>", methods=["GET"])
 def get_user_id(id):
     data = Users.query.filter_by(id=id).first()
     if data:
         return UserSchema(exclude=("password",)).jsonify(data)
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/users/<id>", methods=["PUT"])
+@app.route("/api/users/<id>", methods=["PUT"])
 def update_user_id(id):
     result = Users.query.filter_by(id=id).first()
     if result:
@@ -97,7 +92,7 @@ def update_user_id(id):
         return UserSchema(exclude=("password",)).jsonify(result)
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
-@app.route("/users/<id>", methods=["DELETE"])
+@app.route("/api/users/<id>", methods=["DELETE"])
 def delete_user_id(id):
     data = Users.query.filter_by(id=id).first()
     if data:
@@ -105,7 +100,7 @@ def delete_user_id(id):
         return jsonify({"result": f"Id {id} was deleted"})
     return jsonify({"result": f" Id {id} wasn't found"}),404
 
-@app.route("/api/users/login", methods=["POST"]) # api-i callarin qabagina api artir
+@app.route("/api/users/login", methods=["POST"])
 def login_user():
     data = request.get_json()
     user = Users.query.filter_by(email=data.get("email").lower()).first()
@@ -114,12 +109,11 @@ def login_user():
             return UserSchema(exclude=("password",)).jsonify(user)
     return jsonify({"message": "email or password incorrect"}),404
 
-
+# Not for API calls. For html connection.
 @app.route("/users/signedup",methods=["GET","POST"])
 def signed_up():
     if request.method == "GET":
         return make_response(render_template("index.html"),200)
-
     elif request.method == "POST":
         if request.form["password"] == request.form["password2"]:
             user = UserSchema().load(data = request.form)
@@ -127,7 +121,6 @@ def signed_up():
             schema = UserSchema()
             user = schema.dump(user)
             user.pop("password")
-
             return make_response(render_template("dashboard.html",user=user),200)
 
 @app.route("/users/login", methods=["POST","GET"])
@@ -138,11 +131,8 @@ def login_user_html():
         user = Users.query.filter_by(email=request.form.get("email").lower()).first()
         if user:
             if verify_password(request.form.get("password"),user.password):
-
                 schema = UserSchema()
                 user = schema.dump(user)
                 user.pop("password")
                 return make_response(render_template("dashboard.html",user=user),200)
-
     return jsonify({"message": "email or password incorrect"}),404
-

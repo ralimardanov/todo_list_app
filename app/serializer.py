@@ -20,7 +20,6 @@ class UserSchema(ma.ModelSchema):
     password = fields.Str(required=True,validate=[validate.Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?#&]{8,}$")])
     password2 = fields.Str(required=True,validate=[validate.Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?#&]{8,}$")])
 
-
     @validates_schema(skip_on_field_errors=True) #eger error olsa yuxarida, bura girmiyecek
     def hash_password(self,data,**kwargs):
         hashed_password = get_hash_password(data.get("password"))

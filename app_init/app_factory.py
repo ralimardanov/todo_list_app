@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes="sha256_crypt")
 ma = Marshmallow()
 
 settings = {
-    "prod": "settings.prdsettings.PRDsettings",  # eger fayyl olsa path-deki kimi / istifade olunacag
+    "prod": "settings.prdsettings.PRDsettings",  # if it's a file or a directory, path will be like this - ../../
     "dev": "settings.devsettings.DEVsettings"
 }
 
@@ -26,9 +26,5 @@ def create_app(settings_name):
     settings_obj = get_settings(settings_name)
     app.config.from_object(settings_obj) #this loads the config from the settings_obj. also can be loaded from_envvar
     Migrate(app,db) 
-    # with app.app_context():
-    #     db.create_all()
 
     return app
-
-

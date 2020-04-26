@@ -2,7 +2,6 @@ from settings.settings import Settings
 import os
 
 class PRDsettings(Settings):
-
     DEBUG = False
     SQLALCHEMY_ECHO = False
 
