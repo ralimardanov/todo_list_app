@@ -2,9 +2,7 @@ FROM python:3.7.1
 
 
 ENV FLASK_APP "app.app.py"
-ENV FLASK_ENV "development"
-ENV FLASK_DEBUG True
-ENV APP_SETTINGS=dev
+ENV APP_SETTINGS=prod
 # DB ENV-ler burda olacag
 
 RUN mkdir /app
@@ -17,7 +15,8 @@ RUN apt-get update -y &&    \
     apt-get install -y postgresql-client
 
 # ADD prestart.sh .
-# RUN prestart.sh
+RUN chmod +x prestart.sh
+ENTRYPOINT ["/app/prestart.sh"]
 
 EXPOSE 8080
 
