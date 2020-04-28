@@ -1,0 +1,33 @@
+version: '3'
+services: 
+  postgres:
+    container_name: pgsql
+    image: postgres:9.6.6
+    ports:
+      - "5432:5432"
+    #volumes:
+    #  - $PWD/data:/var/lib/postgresql/data      # create this directory and change owner to jenkins. Change owner to 1000:1000 ( This is because in container jenkins user id is 1000)
+    environment:
+      - "POSTGRES_USER=dev"
+      - "POSTGRES_DB=db"
+      - "POSTGRES_PASSWORD=dev"
+    networks:              # For using this network you should create network in the last line for this docker env.
+      - net
+  flask:
+    container_name: flask
+    build:
+      context: todo_list_app
+    ports:
+      - "8080:8080"
+    environment:
+      - "DB_USER=dev"
+      - "DB_PASSWORD=dev"
+      - "DB_PORT=5432"
+      - "DB_NAME=db"
+      - "DB_HOST=pgsql"
+    networks:
+      - net
+    depends_on:
+      - postgres
+networks:
+  net:
