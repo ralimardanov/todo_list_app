@@ -16,7 +16,7 @@ RUN apt-get update -y &&    \
 
 # ADD prestart.sh .
 RUN chmod +x prestart.sh
-ENTRYPOINT ["/app/prestart.sh"]
+CMD ["/app/prestart.sh"]
 
 EXPOSE 8080
 
