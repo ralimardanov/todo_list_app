@@ -16,7 +16,7 @@ services:
   flask:
     container_name: flask
     build:
-      context: todo_list_app
+      context: .
     ports:
       - "8080:8080"
     environment:
