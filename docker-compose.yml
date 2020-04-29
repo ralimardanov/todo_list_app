@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     #volumes:
-    #  - $PWD/data:/var/lib/postgresql/data      # create this directory and change owner to jenkins. Change owner to 1000:1000 ( This is because in container jenkins user id is 1000)
+    #  - $PWD/data:/var/lib/postgresql/data      
     environment:
       - "POSTGRES_USER=dev"
       - "POSTGRES_DB=db"
