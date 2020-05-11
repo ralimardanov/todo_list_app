@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="{{url_for('static',filename='main.css')}}" rel="stylesheet" media="all">
+    <title>Register</title>
+</head>
+<body>
+    <div id="login-box">
+        <form method="POST" >
+        <div class="left">
+          <h1>Sign up</h1>
+          <input type="text" name="name" placeholder="Username" />
+          {% for error in form.name.errors %}
+          <small class="text-danger">{{ error }}</small>  
+         {% endfor %}
+          
+          <input type="text" name="surname" placeholder="Surname" />
+          {% for error in form.surname.errors %}
+            <small class="text-danger">{{ error }}</small>  
+            {% endfor %}
+
+          <input type="text" name="email" placeholder="E-mail" />
+          {% for error in form.email.errors %}
+            <small class="text-danger">{{ error }}</small>  
+            {% endfor %}
+
+          <input type="password" name="password" placeholder="Password" />
+          {% for error in form.password.errors %}
+          <small class="text-danger">{{ error }}</small>  
+         {% endfor %}
+
+          <input type="password" name="password2" placeholder="Retype password" />
+          {% for error in form.password2.errors %}
+                    <small class="text-danger">{{ error }}</small>  
+                {% endfor %}
+          <input type="submit" name="submit" value="Sign me up" />
+        </div>
+        
+        <div class="right">
+          <span class="loginwith">Sign in with<br />social network</span>
+          
+          <button class="social-signin facebook">Log in with facebook</button>
+          <button class="social-signin twitter">Log in with Twitter</button>
+          <button class="social-signin google">Log in with Google+</button>
+        </div>
+        <div class="or">OR</div>
+        {{ form.csrf_token }}
+    </form>
+      </div>
+</body>
+</html>

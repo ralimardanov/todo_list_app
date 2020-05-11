@@ -1,20 +1,24 @@
 from app_init.app_factory import create_app
 from app.models import ToDo,Users
-from flask import request,jsonify,make_response,render_template
 from db_setup.db_conf import db
-import os
 from app.serializer import TodoSchema,ToDoUpdateSchema,UserSchema,UserUpdateSchema
-from pprint import pprint
-from marshmallow import ValidationError
 from app.utils import verify_password
+from app_init.app_factory import login_manager
+from app_init.app_factory import csrf
+from app.forms import SignUpForm, LoginForm
+from app.utils import get_hash_password
 
+from flask import request,jsonify,make_response,render_template,url_for,redirect,flash
+from marshmallow import ValidationError
+from flask_jwt_extended import jwt_required,jwt_refresh_token_required,create_access_token,create_refresh_token,get_jwt_identity
+from flask_login import login_required,login_user,logout_user,current_user
+import os
+from datetime import timedelta
+import warnings
+
+warnings.simplefilter("ignore") 
 settings_name = os.getenv("APP_SETTINGS")
 app = create_app(settings_name)
-
-# flask login-e baxarsan https://flask-login.readthedocs.io/en/latest/
-# bootstrap cdn https://www.bootstrapcdn.com/
-# user datani edit etmek ucun endpoint yazmaga caliw
-# jinja https://jinja.palletsprojects.com/en/2.11.x/
 
 # for API calls
 # ToDo part:
@@ -59,6 +63,7 @@ def delete_id(id):
 
 # Users part:
 @app.route("/api/users", methods=["POST"])
+@csrf.exempt
 def create_user():
     data = request.get_json()
     try:
@@ -71,11 +76,13 @@ def create_user():
     return UserSchema(exclude=("password",)).jsonify(user)
 
 @app.route("/api/users", methods=["GET"])
+@csrf.exempt
 def get_users_results():
     results = Users.query.all()
     return UserSchema(exclude=("password",)).jsonify(results,many=True)
 
 @app.route("/api/users/<id>", methods=["GET"])
+@csrf.exempt
 def get_user_id(id):
     data = Users.query.filter_by(id=id).first()
     if data:
@@ -83,6 +90,7 @@ def get_user_id(id):
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
 @app.route("/api/users/<id>", methods=["PUT"])
+@csrf.exempt
 def update_user_id(id):
     result = Users.query.filter_by(id=id).first()
     if result:
@@ -93,6 +101,7 @@ def update_user_id(id):
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
 @app.route("/api/users/<id>", methods=["DELETE"])
+@csrf.exempt
 def delete_user_id(id):
     data = Users.query.filter_by(id=id).first()
     if data:
@@ -101,38 +110,113 @@ def delete_user_id(id):
     return jsonify({"result": f" Id {id} wasn't found"}),404
 
 @app.route("/api/users/login", methods=["POST"])
-def login_user():
-    data = request.get_json()
+@csrf.exempt
+def user_login():
+    data = request.json
     user = Users.query.filter_by(email=data.get("email").lower()).first()
     if user:
-        if verify_password(data.get("password"),user.password):
-            return UserSchema(exclude=("password",)).jsonify(user)
+        if verify_password(data.get("password"), user.password):
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id,expires_delta=timedelta(minutes=1))
+            return jsonify(username=user.name, access_token=access_token,refresh_token=refresh_token)
     return jsonify({"message": "email or password incorrect"}),404
+
+@app.route("/api/users/info", methods=["GET","POST"])
+@csrf.exempt
+@jwt_required
+def get_user_info():
+    id = get_jwt_identity()
+    user = Users.query.get(id)
+    if user:
+        return UserSchema(exclude=("password",)).jsonify(user)
+    return jsonify({"message": f"User wasn't found"}), 404
+
+@app.route("/api/users/refresh", methods=["POST","GET"])
+@csrf.exempt
+@jwt_refresh_token_required
+def refresh_user_token():
+    id = get_jwt_identity()
+    user = Users.query.get(id)
+    if user:
+        access_token = create_access_token(identity=id)
+        return jsonify(access_token=access_token)
+    return jsonify({"message": "Token wasn't verified"}), 401
 
 # Not for API calls. For html connection.
-@app.route("/users/signedup",methods=["GET","POST"])
-def signed_up():
-    if request.method == "GET":
-        return make_response(render_template("index.html"),200)
-    elif request.method == "POST":
-        if request.form["password"] == request.form["password2"]:
-            user = UserSchema().load(data = request.form)
-            user.save_db()
-            schema = UserSchema()
-            user = schema.dump(user)
-            user.pop("password")
-            return make_response(render_template("dashboard.html",user=user),200)
+@app.route("/users/register", methods=["GET","POST"])
+def register():
+    form = SignUpForm()
+    
+    if form.validate_on_submit():
+        data = dict(
+            name = form.name.data,
+            surname = form.surname.data,
+            email = form.email.data,
+            password = form.password.data,
+            password2 = form.password2.data
+        )
+        user = UserSchema().load(data)
+        user.save_db()
+        login_user(user)
+        print(user)
+        return redirect(url_for("dashboard"))
+
+    return render_template("register.html",form=form)
+
+@app.route("/users/",methods=["GET"])
+@app.route("/users/dashboard",methods=["GET","POST"])
+@login_required
+def dashboard():
+    return render_template("dashboard.html",form=current_user)
 
 @app.route("/users/login", methods=["POST","GET"])
+@csrf.exempt
 def login_user_html():
-    if request.method == "GET":
-        return make_response(render_template("login.html"))
-    elif request.method == "POST":
-        user = Users.query.filter_by(email=request.form.get("email").lower()).first()
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        user = Users.query.filter_by(email=email).first()
         if user:
-            if verify_password(request.form.get("password"),user.password):
-                schema = UserSchema()
-                user = schema.dump(user)
-                user.pop("password")
-                return make_response(render_template("dashboard.html",user=user),200)
-    return jsonify({"message": "email or password incorrect"}),404
+            if verify_password(password, user.password):
+                login_user(user)     
+                return redirect(url_for("dashboard"))
+        flash("User not found")
+    return render_template("login.html",form=form)
+
+@app.route("/users/editinfo", methods=["POST", "GET"])
+@login_required
+def edit_profile():
+    form = SignUpForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        data = dict(
+            name = form.name.data,
+            surname = form.surname.data,
+            email = form.email.data,
+            password = get_hash_password(form.password.data)
+        )
+        user = current_user
+        user.update_db(**data)
+        return redirect(url_for("dashboard"))
+    return render_template("update.html",form=form,user=current_user)
+
+# Flask Login stuff
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('login_user_html'))
+
+@app.route("/users/logout",methods=["GET"])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login_user_html"))
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Check if user is logged-in on every page load."""
+    if user_id is not None:
+        return Users.query.get(user_id)
+    return None

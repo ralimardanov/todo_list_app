@@ -6,7 +6,7 @@
     <link href="{{url_for('static',filename='login.css')}}" rel="stylesheet" media="all">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
-    <title>Document</title>
+    <title>Login</title>
 </head>
 <body>
     <div class="global-container">
@@ -14,6 +14,9 @@
         <div class="card-body">
             <h3 class="card-title text-center">Log in to Flask App</h3>
             <div class="card-text">
+            {%for message in get_flashed_messages()%}
+            <small class="text-danger">{{ message }}</small>
+            {%endfor%}
                 <!--
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> -->
                 <form method="POST">
@@ -30,8 +33,9 @@
                     <button type="submit" class="btn btn-primary btn-block">Sign in</button>
                     
                     <div class="sign-up">
-                        Don't have an account? <a href="#">Create One</a>
+                        Don't have an account? <a href="{{url_for('register')}}">Create One</a>
                     </div>
+                    {{ form.csrf_token }}
                 </form>
             </div>
         </div>
