@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="{{url_for('static',filename='main.css')}}" rel="stylesheet" media="all">
+
+    <title>Update your password</title>
+</head>
+<body>
+    <div id="login-box">
+        <form method="POST" >
+        <div class="left">
+          <h1>Update your password</h1>
+          <input type="text" name="email" placeholder="E-mail" />
+          <input type="password" name="password" placeholder="Password" />
+          <input type="password" name="password2" placeholder="Retype password" />
+          <input type="submit" name="submit" value="Save" />
+        </div>          
+        {{ form.csrf_token }}
+    </form>
+      </div>
+</body>
+</html>

@@ -14,3 +14,9 @@ class LoginForm(FlaskForm):
     email = StringField("Email",validators=[Email(message="Enter valid email address"),DataRequired()])
     password = PasswordField("Password",validators=[DataRequired(),Length(min=3,max=123)])
     submit = SubmitField('Log In')
+
+class PassChangeForm(FlaskForm):
+    email = StringField("Email",validators=[Email(message="Enter valid email address"),DataRequired()])
+    password = PasswordField("Password",validators=[DataRequired(),Length(min=3,max=123)])
+    password2 = PasswordField("Confirm Password",validators=[EqualTo("password"),DataRequired()])
+    submit = SubmitField('submit')

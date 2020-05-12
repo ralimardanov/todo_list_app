@@ -5,7 +5,7 @@ from app.serializer import TodoSchema,ToDoUpdateSchema,UserSchema,UserUpdateSche
 from app.utils import verify_password
 from app_init.app_factory import login_manager
 from app_init.app_factory import csrf
-from app.forms import SignUpForm, LoginForm
+from app.forms import SignUpForm, LoginForm, PassChangeForm
 from app.utils import get_hash_password
 
 from flask import request,jsonify,make_response,render_template,url_for,redirect,flash
@@ -158,7 +158,6 @@ def register():
         user = UserSchema().load(data)
         user.save_db()
         login_user(user)
-        print(user)
         return redirect(url_for("dashboard"))
 
     return render_template("register.html",form=form)
@@ -170,10 +169,8 @@ def dashboard():
     return render_template("dashboard.html",form=current_user)
 
 @app.route("/users/login", methods=["POST","GET"])
-@csrf.exempt
 def login_user_html():
     form = LoginForm()
-
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
@@ -185,11 +182,26 @@ def login_user_html():
         flash("User not found")
     return render_template("login.html",form=form)
 
+@app.route("/users/editpass", methods=["POST", "GET"])
+def edit_pass():
+    form = PassChangeForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.email.data).first()
+        data = dict(
+            email = form.email.data,
+            password = form.password.data
+        )
+        if user:
+            data = UserUpdateSchema().load(data)
+            user = user.update_db(**data)
+            return redirect(url_for("login_user_html"))
+        flash("User not found")
+    return render_template("editpass.html",form=form)
+
 @app.route("/users/editinfo", methods=["POST", "GET"])
 @login_required
 def edit_profile():
     form = SignUpForm()
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         data = dict(
             name = form.name.data,

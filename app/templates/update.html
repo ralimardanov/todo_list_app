@@ -35,7 +35,10 @@
 
           <input type="password" name="password2" placeholder="Retype password" />
           <input type="submit" name="submit" value="Save" />
-        </div>          
+        </div>
+        <div class="right">
+        <button class="button"><a href="{{url_for('dashboard')}}">Return to your dashboard</a></button>  
+        </div>       
         {{ form.csrf_token }}
     </form>
       </div>
