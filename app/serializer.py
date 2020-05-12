@@ -1,15 +1,15 @@
 from app_init.app_factory import ma,fields,validate,validates_schema
 from app.models import ToDo,Users
 from app.utils import get_hash_password
-class TodoSchema(ma.ModelSchema):   # burda db model lazimdi ve requireddi gostermesen error verecey
-    date = fields.Date(required=True)  # default formati ISO formatidi,dunya standartinda
-    whattodo = fields.Str(required=True,validate=[validate.Length(min=2,max=255)]) # validate listdi ona goreki bir nece validatsiyan ola biler
+class TodoSchema(ma.ModelSchema):                                                  # db model is required here
+    date = fields.Date(required=True)                                              # by default is used ISO format
+    whattodo = fields.Str(required=True,validate=[validate.Length(min=2,max=255)]) # validate is a list and several validations can be used, that's why [] brackets are used
 
     class Meta:
         model = ToDo
 
-class ToDoUpdateSchema(ma.Schema):  # bu ancag schema yaradirki validatsiya olsun ve model teleb etmir
-    date = fields.Date()  # default formati ISO formatidi,dunya standartinda
+class ToDoUpdateSchema(ma.Schema):  # this one only creates schema for validation and doesn't need db model
+    date = fields.Date()  
     whattodo = fields.Str(validate=[validate.Length(min=2,max=255)])
 
 class UserSchema(ma.ModelSchema):
@@ -19,7 +19,7 @@ class UserSchema(ma.ModelSchema):
     password = fields.Str(required=True,validate=[validate.Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?#&]{8,}$")])
     password2 = fields.Str(required=True,validate=[validate.Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?#&]{8,}$")])
 
-    @validates_schema(skip_on_field_errors=True) #eger error olsa yuxarida, bura girmiyecek
+    @validates_schema(skip_on_field_errors=True) #if there will be an error above, it won't go in here
     def hash_password(self, data, **kwargs): 
         hashed_password = get_hash_password(data.get("password"))
         data.update({"password" : hashed_password})

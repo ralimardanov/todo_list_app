@@ -1,5 +1,5 @@
 from db_setup.db_conf import db
-from sqlalchemy.sql import func #to be able to use functions in DB
+from sqlalchemy.sql import func              #to be able to use functions in DB
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 
@@ -33,7 +33,7 @@ class Users(UserMixin, db.Model):
     surname = db.Column(db.String,nullable=False)
     email = db.Column(db.String(),nullable=False,unique=True)
     password = db.Column(db.String(),nullable=False)
-    created = db.Column(db.DateTime(timezone=True), default=func.now()) #imenno db-deki datetimenan oturacaq
+    created = db.Column(db.DateTime(timezone=True), default=func.now()) #this will save datetime as it is in db
 
     # def __repr__(self):
     #     return "<User {}>".format(self.username)
@@ -51,4 +51,4 @@ class Users(UserMixin, db.Model):
     def delete_from_db(self):
         db.session.delete(self)
         db.session.commit()
-        return True # return self-de ede bilersen eger silennen sora lazim olacagsa
+        return True            #you can do return self, in case if you'll use it somewhere else

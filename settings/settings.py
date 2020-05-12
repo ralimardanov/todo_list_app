@@ -10,7 +10,7 @@ class Settings(metaclass=MetaFlaskEnv): #you instruct your class to use this met
     JWT_SECRET_KEY = os.urandom(32)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)
     SECRET_KEY = os.urandom(32) #for generating crytographically suitable random bytes to use for the secret key
-    SQLALCHEMY_ECHO = True #If set to True SQLAlchemy will log all the statements issued to stderr which can be useful for debugging.
+    SQLALCHEMY_ECHO = True      #If set to True SQLAlchemy will log all the statements issued to stderr which can be useful for debugging.
 
     LOGGER_NAME = "%s.logger" % project_name
     LOG_FILENAME = "app.%s.log" % project_name

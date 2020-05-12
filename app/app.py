@@ -20,14 +20,14 @@ warnings.simplefilter("ignore")
 settings_name = os.getenv("APP_SETTINGS")
 app = create_app(settings_name)
 
-# for API calls
+# For API calls
 # ToDo part:
 @app.route("/api/todo", methods=["GET"])
 def get_results():
-    # results = db.session.query(ToDo).all() # bu method pure SqlAlchemy-ide verilme qaydasidi
-    results = ToDo.query.all() # ancaq Flask-Sqlalchemy-de iwleyir
+    # results = db.session.query(ToDo).all()         - this method is pure SqlAlchemy method
+    results = ToDo.query.all()                       # this one works only on Flask-Sqlalchemy
     return TodoSchema().jsonify(results,many=True)
-    # eger list-in icinde objectleri serialize elemek isdesen many=True vermelisen
+                                                     # if you want to serialize objects inside list, you should use many=True
 
 @app.route("/api/todo/<id>", methods=["GET"])
 def get_result(id):
@@ -142,7 +142,7 @@ def refresh_user_token():
         return jsonify(access_token=access_token)
     return jsonify({"message": "Token wasn't verified"}), 401
 
-# Not for API calls. For html connection.
+# For HTML connection
 @app.route("/users/register", methods=["GET","POST"])
 def register():
     form = SignUpForm()

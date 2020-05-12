@@ -6,8 +6,8 @@ from marshmallow import fields,validate,validates_schema
 from flask_migrate import Migrate
 from passlib.context import CryptContext
 from flask_wtf.csrf import CSRFProtect
-from flask_jwt_extended import JWTManager #burda ancaq JWTmanager lazimdi
-from flask_login import LoginManager #burda ancaq LoginManager lazimdi
+from flask_jwt_extended import JWTManager 
+from flask_login import LoginManager 
 
 pwd_context = CryptContext(schemes="sha256_crypt")
 ma = Marshmallow()
@@ -33,7 +33,7 @@ def create_app(settings_name):
     jwt.init_app(app)
     login_manager.init_app(app)
     settings_obj = get_settings(settings_name)
-    app.config.from_object(settings_obj) #this loads the config from the settings_obj. also can be loaded from_envvar
+    app.config.from_object(settings_obj)             #this loads the config from the settings_obj. also can be loaded from_envvar
     Migrate(app,db) 
 
     return app
