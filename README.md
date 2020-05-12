@@ -1,2 +1,2 @@
-# todo_list_app
-todo list app on flask.
+#ToDo app 
+This is test ToDo app on Flask with Postgres as DB.
