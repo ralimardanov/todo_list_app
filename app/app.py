@@ -1,7 +1,7 @@
 from app_init.app_factory import create_app
 from app.models import ToDo,Users
 from db_setup.db_conf import db
-from app.serializer import TodoSchema,ToDoUpdateSchema,UserSchema,UserUpdateSchema
+from app.serializer import TodoSchema,ToDoUpdateSchema,UserSchema,UserUpdateSchema,UserUpdateFormSchema
 from app.utils import verify_password
 from app_init.app_factory import login_manager
 from app_init.app_factory import csrf
@@ -10,11 +10,14 @@ from app.utils import get_hash_password
 
 from flask import request,jsonify,make_response,render_template,url_for,redirect,flash
 from marshmallow import ValidationError
-from flask_jwt_extended import jwt_required,jwt_refresh_token_required,create_access_token,create_refresh_token,get_jwt_identity
+from flask_jwt_extended import jwt_required,jwt_refresh_token_required,create_access_token,create_refresh_token,get_jwt_identity,get_jwt_claims
 from flask_login import login_required,login_user,logout_user,current_user
 import os
 from datetime import timedelta
 import warnings
+
+# site scraping
+# telegram bot
 
 warnings.simplefilter("ignore") 
 settings_name = os.getenv("APP_SETTINGS")
@@ -104,9 +107,13 @@ def update_user_id(id):
 @csrf.exempt
 def delete_user_id(id):
     data = Users.query.filter_by(id=id).first()
+    # user_claims = get_jwt_claims()
+    # if user_claims.get("is_admin"):
+
     if data:
         data.delete_from_db()
         return jsonify({"result": f"Id {id} was deleted"})
+    
     return jsonify({"result": f" Id {id} wasn't found"}),404
 
 @app.route("/api/users/login", methods=["POST"])
@@ -114,9 +121,10 @@ def delete_user_id(id):
 def user_login():
     data = request.json
     user = Users.query.filter_by(email=data.get("email").lower()).first()
+    print(user)
     if user:
         if verify_password(data.get("password"), user.password):
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=user.id) #user_claims={"is_admin": True} tokene elave options vermek ucundu ; fresh=True tokenin tezeliyin teyin etmek ucun
             refresh_token = create_refresh_token(identity=user.id,expires_delta=timedelta(minutes=1))
             return jsonify(username=user.name, access_token=access_token,refresh_token=refresh_token)
     return jsonify({"message": "email or password incorrect"}),404
@@ -155,12 +163,26 @@ def register():
             password = form.password.data,
             password2 = form.password2.data
         )
-        user = UserSchema().load(data)
+        # user = UserSchema().load(data)
+        user = Users(**data)
+        user.password = get_hash_password(user.password)
         user.save_db()
         login_user(user)
         return redirect(url_for("dashboard"))
 
     return render_template("register.html",form=form)
+
+
+@app.errorhandler(404)
+def not_found_page(e):
+    return render_template("404page.html")
+
+
+@app.errorhandler(500)
+def error_page(e):
+    return render_template("500_error.html")
+
+
 
 @app.route("/users/",methods=["GET"])
 @app.route("/users/dashboard",methods=["GET","POST"])
@@ -192,7 +214,7 @@ def edit_pass():
             password = form.password.data
         )
         if user:
-            data = UserUpdateSchema().load(data)
+            data = UserUpdateFormSchema().load(data)
             user = user.update_db(**data)
             return redirect(url_for("login_user_html"))
         flash("User not found")

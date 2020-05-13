@@ -8,13 +8,13 @@ from passlib.context import CryptContext
 from flask_wtf.csrf import CSRFProtect
 from flask_jwt_extended import JWTManager 
 from flask_login import LoginManager 
-
+from flask_cors import CORS
 pwd_context = CryptContext(schemes="sha256_crypt")
 ma = Marshmallow()
 csrf = CSRFProtect()
 jwt = JWTManager()
 login_manager = LoginManager()
-
+cors = CORS()
 settings = {
     "prod": "settings.prdsettings.PRDsettings",  # if it's a file or a directory, path will be like this - ../../
     "dev": "settings.devsettings.DEVsettings"
@@ -31,6 +31,7 @@ def create_app(settings_name):
     ma.init_app(app)
     csrf.init_app(app)
     jwt.init_app(app)
+    cors.init_app(app)
     login_manager.init_app(app)
     settings_obj = get_settings(settings_name)
     app.config.from_object(settings_obj)             #this loads the config from the settings_obj. also can be loaded from_envvar
