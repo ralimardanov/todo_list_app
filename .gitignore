@@ -4,3 +4,9 @@
 *vscode
 /.venv
 *.venv
+<<<<<<< HEAD
+=======
+*.key
+*.pem
+*.crt
+>>>>>>> 98e4ceba91b1598cedf20a69903a86b6bea426df

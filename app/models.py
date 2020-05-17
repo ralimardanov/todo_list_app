@@ -1,4 +1,4 @@
-from db_setup.db_conf import db
+from extensions.extension import db
 from sqlalchemy.sql import func              #to be able to use functions in DB
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
@@ -35,8 +35,8 @@ class Users(UserMixin, db.Model):
     password = db.Column(db.String(),nullable=False)
     created = db.Column(db.DateTime(timezone=True), default=func.now()) #this will save datetime as it is in db
 
-    # def __repr__(self):
-    #     return "<User {}>".format(self.username)
+    def __repr__(self):
+        return "<User {} {} {}>".format(self.name,self.surname,self.email)
 
     def save_db(self):
         db.session.add(self)
