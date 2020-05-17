@@ -1,4 +1,4 @@
-from app_init.app_factory import ma,fields,validate,validates_schema
+from extensions.extension import ma,fields,validate,validates_schema
 from app.models import ToDo,Users
 from app.utils import get_hash_password
 

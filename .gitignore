@@ -4,4 +4,6 @@
 *vscode
 /.venv
 *.venv
-
+*.key
+*.pem
+*.crt

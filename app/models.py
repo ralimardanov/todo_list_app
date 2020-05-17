@@ -1,4 +1,4 @@
-from db_setup.db_conf import db
+from extensions.extension import db
 from sqlalchemy.sql import func              #to be able to use functions in DB
 from flask_login import UserMixin
 from flask_wtf import FlaskForm

@@ -31,7 +31,7 @@ mccabe==0.6.1
 netmiko==3.1.0
 paramiko==2.7.1
 passlib==1.7.2
-psycopg2==2.8.5
+psycopg2-binary==2.8.5
 pycodestyle==2.5.0
 pycparser==2.20
 PyJWT==1.7.1

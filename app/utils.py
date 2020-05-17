@@ -1,4 +1,4 @@
-from app_init.app_factory import pwd_context
+from extensions.extension import pwd_context
 
 def get_hash_password(plain_text):
     return pwd_context.hash(plain_text)
