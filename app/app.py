@@ -16,7 +16,7 @@ import os
 from datetime import timedelta
 import warnings
 
-warnings.simplefilter("ignore") 
+warnings.simplefilter("ignore")
 settings_name = os.getenv("APP_SETTINGS")
 app = create_app(settings_name)
 
@@ -31,7 +31,7 @@ def get_results():
 
 @app.route("/api/todo/<id>", methods=["GET"])
 def get_result(id):
-    data = ToDo.query.filter_by(id=id).first() 
+    data = ToDo.query.filter_by(id=id).first()
     if data:
         return TodoSchema().jsonify(data)
     return jsonify({"result": f"Id {id} wasn't found"}),404
@@ -50,7 +50,7 @@ def update(id):
         data = request.json
         data = ToDoUpdateSchema().load(data)
         result = result.update_db(**data)
-        return TodoSchema().jsonify(result)        
+        return TodoSchema().jsonify(result)
     return jsonify({"result": f"Id {id} wasn't found"}),404
 
 @app.route("/api/todo/<id>", methods=["DELETE"])
@@ -146,7 +146,7 @@ def refresh_user_token():
 @app.route("/users/register", methods=["GET","POST"])
 def register():
     form = SignUpForm()
-    
+
     if form.validate_on_submit():
         data = dict(
             name = form.name.data,
@@ -177,7 +177,7 @@ def login_user_html():
         user = Users.query.filter_by(email=email).first()
         if user:
             if verify_password(password, user.password):
-                login_user(user)     
+                login_user(user)
                 return redirect(url_for("dashboard"))
         flash("User not found")
     return render_template("login.html",form=form)
