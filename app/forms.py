@@ -1,4 +1,4 @@
-from wtforms import SubmitField, StringField, PasswordField
+from wtforms import SubmitField, StringField, PasswordField,DateTimeField,DateField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_wtf import FlaskForm
 
@@ -21,4 +21,5 @@ class PassChangeForm(FlaskForm):
     password2 = PasswordField("Confirm Password",validators=[EqualTo("password"),DataRequired()])
     submit = SubmitField('submit')
 class TodoForm(FlaskForm):
-    pass
+    date = DateField("Todo date",validators=[DataRequired()])
+    whattodo = StringField("Yout Todo",validators=[DataRequired(),Length(min=5,max=350)])

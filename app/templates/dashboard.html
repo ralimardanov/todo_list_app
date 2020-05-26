@@ -21,9 +21,20 @@
       <h3>Name: {{form.name}}</h3>
       <h3>Surname: {{form.surname}}</h3>
       <h3>Email: {{form.email}}</h3>
+      <h2>My todo list</h2>
+        {% for todo in form.todos %}
+        <h3>{{loop.index}} Todo Expire date : {{todo.date}} </h3>
+        <h4> Todo : {{todo.whattodo}} </h4>
+      <button class="button"><a href="{{url_for('todo_app.update_my_todo',id=todo.id)}}">Edit</a></button>
+
+        <br>
+        {% endfor %}
+
     </div>
     <button class="button"><a href="{{url_for('user_app.logout')}}">Logout</a></button>
     <button class="button"><a href="{{url_for('user_app.edit_profile')}}">Edit your info</a></button>
+    <button class="button"><a href="{{url_for('todo_app.create_todo')}}">Add Todo</a></button>
+
 </div>
 
 </body>

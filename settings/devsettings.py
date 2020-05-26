@@ -9,7 +9,7 @@ class DEVsettings(Settings):
     DB_USER = os.getenv("DB_USER", "tural")
     DEVELOPMENT = True
     # SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    SQLALCHEMY_DATABASE_URI = f"postgresql:///testdb"
+    SQLALCHEMY_DATABASE_URI = f"postgresql:///lessondb"
 
 
 

@@ -9,7 +9,7 @@ class ToDo(db.Model):
     id = db.Column(db.Integer(),autoincrement=True,primary_key=True)
     date = db.Column(db.Date(),nullable=False)
     whattodo = db.Column(db.String,nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def save_db(self):
         db.session.add(self)

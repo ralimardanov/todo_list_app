@@ -1,11 +1,35 @@
-from flask import Blueprint,jsonify,request
+from flask import Blueprint,jsonify,request,render_template,url_for,redirect,flash
 from app.models import ToDo
 from app.serializer import TodoSchema,ToDoUpdateSchema
+from app.forms import TodoForm
 from extensions.extension import csrf
+from flask_login import current_user
+from flask_login import login_required
 
 
 todo_app = Blueprint("todo_app",__name__)
 
+
+@todo_app.route("/todo",methods=["GET","POST"])
+@login_required
+def create_todo():
+    form = TodoForm()
+
+    if form.validate_on_submit():
+        todo_info = {
+            "date": form.date.data,
+            "whattodo":  form.whattodo.data,
+            "user_id":  current_user.id
+        }
+        todo = ToDo(**todo_info)
+        todo.save_db()
+        return redirect(url_for("user_app.dashboard"))
+    return render_template("todo.html",form=form)
+
+
+@todo_app.route("/todo/<id>",methods=["POST"])
+def update_my_todo():
+    pass
 
 @todo_app.route("/api/todo", methods=["GET"])
 @csrf.exempt

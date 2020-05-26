@@ -17,60 +17,13 @@ import os
 from datetime import timedelta
 import warnings
 
-<<<<<<< HEAD:app/app.py
-warnings.simplefilter("ignore")
-settings_name = os.getenv("APP_SETTINGS")
-app = create_app(settings_name)
 
-# For API calls
-# ToDo part:
-@app.route("/api/todo", methods=["GET"])
-def get_results():
-    # results = db.session.query(ToDo).all()         - this method is pure SqlAlchemy method
-    results = ToDo.query.all()                       # this one works only on Flask-Sqlalchemy
-    return TodoSchema().jsonify(results,many=True)
-                                                     # if you want to serialize objects inside list, you should use many=True
-
-@app.route("/api/todo/<id>", methods=["GET"])
-def get_result(id):
-    data = ToDo.query.filter_by(id=id).first()
-    if data:
-        return TodoSchema().jsonify(data)
-    return jsonify({"result": f"Id {id} wasn't found"}),404
-
-@app.route("/api/todo", methods=["POST"])
-def create():
-    data = request.json
-    todo = TodoSchema().load(data)
-    todo.save_db()
-    return TodoSchema().jsonify(todo)
-
-@app.route("/api/todo/<id>", methods=["PUT"])
-def update(id):
-    result = ToDo.query.filter_by(id=id).first()
-    if result:
-        data = request.json
-        data = ToDoUpdateSchema().load(data)
-        result = result.update_db(**data)
-        return TodoSchema().jsonify(result)
-    return jsonify({"result": f"Id {id} wasn't found"}),404
-
-@app.route("/api/todo/<id>", methods=["DELETE"])
-def delete_id(id):
-    data = ToDo.query.filter_by(id=id).first()
-    if data:
-        data.delete_from_db()
-        return jsonify({"result": f"Id {id} was deleted"})
-    return jsonify({"result": f" Id {id} wasn't found"}),404
-=======
-# site scraping
 # telegram bot
 
 warnings.simplefilter("ignore") 
 # settings_name = os.getenv("APP_SETTINGS")
 # app = create_app(settings_name)
 user_app = Blueprint("user_app",__name__)
->>>>>>> 98e4ceba91b1598cedf20a69903a86b6bea426df:app/user_app.py
 
 # Users part:
 @user_app.route("/api/users", methods=["POST"])
@@ -206,9 +159,7 @@ def login_user_html():
         user = Users.query.filter_by(email=email).first()
         if user:
             if verify_password(password, user.password):
-                login_user(user)
-                return redirect(url_for("dashboard"))
-                login_user(user)     
+                login_user(user)    
                 return redirect(url_for("user_app.dashboard"))
         flash("User not found")
     return render_template("login.html",form=form)
