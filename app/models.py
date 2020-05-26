@@ -9,6 +9,7 @@ class ToDo(db.Model):
     id = db.Column(db.Integer(),autoincrement=True,primary_key=True)
     date = db.Column(db.Date(),nullable=False)
     whattodo = db.Column(db.String,nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def save_db(self):
         db.session.add(self)
@@ -34,6 +35,7 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(),nullable=False,unique=True)
     password = db.Column(db.String(),nullable=False)
     created = db.Column(db.DateTime(timezone=True), default=func.now()) #this will save datetime as it is in db
+    todos = db.relationship("ToDo", backref="user", lazy=True)
 
     def __repr__(self):
         return "<User {} {} {}>".format(self.name,self.surname,self.email)

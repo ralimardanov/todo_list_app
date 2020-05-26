@@ -206,13 +206,10 @@ def login_user_html():
         user = Users.query.filter_by(email=email).first()
         if user:
             if verify_password(password, user.password):
-<<<<<<< HEAD:app/app.py
                 login_user(user)
                 return redirect(url_for("dashboard"))
-=======
                 login_user(user)     
                 return redirect(url_for("user_app.dashboard"))
->>>>>>> 98e4ceba91b1598cedf20a69903a86b6bea426df:app/user_app.py
         flash("User not found")
     return render_template("login.html",form=form)
 
@@ -247,6 +244,11 @@ def edit_profile():
         user.update_db(**data)
         return redirect(url_for("user_app.dashboard"))
     return render_template("update.html",form=form,user=current_user)
+
+@user_app.route("/users/todo", methods=["POST", "GET"])
+@login_required
+def todo_profile():
+    pass
 
 # Flask Login stuff
 @login_manager.unauthorized_handler

@@ -20,3 +20,5 @@ class PassChangeForm(FlaskForm):
     password = PasswordField("Password",validators=[DataRequired(),Length(min=3,max=123)])
     password2 = PasswordField("Confirm Password",validators=[EqualTo("password"),DataRequired()])
     submit = SubmitField('submit')
+class TodoForm(FlaskForm):
+    pass
