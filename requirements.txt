@@ -29,7 +29,7 @@ marshmallow==3.5.1
 marshmallow-sqlalchemy==0.22.3
 mccabe==0.6.1
 netmiko==3.1.0
-paramiko==2.7.1
+paramiko==2.10.1
 passlib==1.7.2
 psycopg2-binary==2.8.5
 pycodestyle==2.5.0
